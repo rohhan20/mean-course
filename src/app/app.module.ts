@@ -15,6 +15,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { HeaderComponent } from './header/header.component';
 import { PostListComponent } from './posts/post-list/post-list.component';
 import { PostsService } from '../services/post.service';
+import { HttpClientModule, provideHttpClient } from '@angular/common/http';
 
 
 @NgModule({
@@ -35,9 +36,10 @@ import { PostsService } from '../services/post.service';
     MatButtonModule,
     MatToolbarModule,
     MatExpansionModule,
+    HttpClientModule,
   ],
   providers: [
-    provideClientHydration(withEventReplay())
+    provideClientHydration(withEventReplay()),
   ],
   bootstrap: [AppComponent]
 })

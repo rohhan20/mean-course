@@ -19,6 +19,8 @@ export class PostListComponent implements OnInit, OnDestroy{
       next: (posts)=>{this.posts = posts},
       error: (err) => {console.log(err)},
     });
+    this.postService.getPosts();
+    
   }
 
   ngOnDestroy(): void {
