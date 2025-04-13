@@ -20,7 +20,10 @@ export class PostListComponent implements OnInit, OnDestroy{
       error: (err) => {console.log(err)},
     });
     this.postService.getPosts();
-    
+  }
+
+  onDeletePost(id: string){
+    this.postService.deletePost(id);
   }
 
   ngOnDestroy(): void {
