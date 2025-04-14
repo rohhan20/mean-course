@@ -16,7 +16,7 @@ export class PostsService{
         const newPost: Post = {id: null, title: title, content: content};
         this.http.post<{message: string, postId: string}>('http://localhost:3000/api/posts', newPost).subscribe({
             next: (response) => {
-                newPost.id = response.postId
+                newPost.id = response.postId;
                 this.posts.push(newPost);
                 this.postsSubject.next([...this.posts]);
             }
@@ -32,20 +32,37 @@ export class PostsService{
         }))
         .subscribe({
             next: (posts) => {
+                this.posts = posts;
                 this.postsSubject.next([...posts]);
             }
         });
     }
 
     deletePost(postId: string){
-        this.http.delete('http://localhost:3000/api/posts/'+postId)
+        this.http.delete<{message: string}>('http://localhost:3000/api/posts/'+postId)
         .subscribe({
-            next: (message) => {
-                console.log(message);
-                const updatedPosts = this.posts.filter(post => post.id !== postId); // TODO: Fix this.
+            next: (response) => {
+                console.log(response.message);
+                this.posts = this.posts.filter(post => post.id !== postId);
                 this.postsSubject.next([...this.posts]);
             }
         });
+    }
+
+    updatePost(id: string, title: string, content: string){
+        const updatedPost: Post = {id: id, title: title, content: content};
+        this.http.patch("http://localhost:3000/api/posts/" + id, updatedPost)
+        .subscribe((response)=>{
+            console.log(response);
+            const postIndex = this.posts.findIndex(p=>p.id === updatedPost.id);
+            this.posts[postIndex] = updatedPost;
+            this.postsSubject.next([...this.posts]);
+        });
+    }
+
+    getPost(postId: string) {
+        // return {...this.posts.find(post=>post.id === postId)};
+        return this.http.get<{_id: string, title: string, content: string}>("http://localhost:3000/api/posts/" + postId);
     }
 
     getPostUpdateListner(){

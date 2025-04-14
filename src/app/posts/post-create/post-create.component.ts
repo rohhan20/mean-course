@@ -1,7 +1,8 @@
-import { Component, EventEmitter, inject, Output } from '@angular/core';
+import { Component, EventEmitter, inject, OnInit, Output } from '@angular/core';
 import { Post } from '../../models/post.model';
 import { NgForm } from '@angular/forms';
 import { PostsService } from '../../../services/post.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-post-create',
@@ -9,13 +10,34 @@ import { PostsService } from '../../../services/post.service';
   templateUrl: './post-create.component.html',
   styleUrl: './post-create.component.css'
 })
-export class PostCreateComponent {
+export class PostCreateComponent implements OnInit{
   postService: PostsService = inject(PostsService);
+  activatedRoute: ActivatedRoute = inject(ActivatedRoute);
+  post: Post;
+  private mode: string = 'create';
 
-  onAddPost(postForm: NgForm){
+  onSavePost(postForm: NgForm){
     if(postForm.valid){
-      this.postService.addPost(postForm.value.title, postForm.value.content);      
+      if(this.mode == 'create'){
+        this.postService.addPost(postForm.value.title, postForm.value.content); 
+      } else {
+        this.postService.updatePost(this.post.id, postForm.value.title, postForm.value.content);
+      }
     }
     postForm.resetForm();
+  }
+
+  ngOnInit(): void {
+    this.activatedRoute.paramMap.subscribe((paramMap)=>{
+      if(paramMap.has('postId')) {
+        this.mode = 'edit';
+        const postId = paramMap.get('postId');
+        this.postService.getPost(postId).subscribe(post=>{
+          this.post = {id: post._id, title: post.title, content: post.content};
+        });   
+      } else {
+        this.mode = 'create';
+      }
+    });
   }
 }
