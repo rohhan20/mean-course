@@ -2,12 +2,14 @@ import { inject, Injectable } from "@angular/core";
 import { Post } from "../app/models/post.model";
 import { BehaviorSubject, map, Subject } from "rxjs";
 import { HttpClient } from "@angular/common/http";
+import { Router } from "@angular/router";
 
 @Injectable({
     providedIn: 'root'
 })
 export class PostsService{
     http: HttpClient = inject(HttpClient)
+    router: Router = inject(Router);
 
     private posts: Post[] = [];
     private postsSubject = new Subject<Post[]>();
@@ -19,6 +21,7 @@ export class PostsService{
                 newPost.id = response.postId;
                 this.posts.push(newPost);
                 this.postsSubject.next([...this.posts]);
+                this.router.navigate([""]);
             }
         });
     }
@@ -57,6 +60,7 @@ export class PostsService{
             const postIndex = this.posts.findIndex(p=>p.id === updatedPost.id);
             this.posts[postIndex] = updatedPost;
             this.postsSubject.next([...this.posts]);
+            this.router.navigate([""]);
         });
     }
 

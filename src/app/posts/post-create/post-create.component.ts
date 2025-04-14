@@ -13,8 +13,10 @@ import { ActivatedRoute } from '@angular/router';
 export class PostCreateComponent implements OnInit{
   postService: PostsService = inject(PostsService);
   activatedRoute: ActivatedRoute = inject(ActivatedRoute);
+
   post: Post;
   private mode: string = 'create';
+  isLoading: boolean = false;
 
   onSavePost(postForm: NgForm){
     if(postForm.valid){
@@ -30,10 +32,12 @@ export class PostCreateComponent implements OnInit{
   ngOnInit(): void {
     this.activatedRoute.paramMap.subscribe((paramMap)=>{
       if(paramMap.has('postId')) {
+        this.isLoading = true;
         this.mode = 'edit';
         const postId = paramMap.get('postId');
         this.postService.getPost(postId).subscribe(post=>{
           this.post = {id: post._id, title: post.title, content: post.content};
+          this.isLoading = false
         });   
       } else {
         this.mode = 'create';
