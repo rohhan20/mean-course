@@ -7,7 +7,6 @@ const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 
-// oAxAas2d1pvdRVdX
 mongoose.connect("mongodb+srv://max:oAxAas2d1pvdRVdX@cluster0.ikhdkbl.mongodb.net/node-angular?retryWrites=true&w=majority&appName=Cluster0")
     .then(()=>{console.log("Connected to the database!")})
     .catch(()=>{console.log("Connection Failed!")});

@@ -1,6 +1,6 @@
 import { Component, EventEmitter, inject, OnInit, Output } from '@angular/core';
 import { Post } from '../../models/post.model';
-import { NgForm } from '@angular/forms';
+import { FormControl, FormGroup, NgForm, Validators } from '@angular/forms';
 import { PostsService } from '../../../services/post.service';
 import { ActivatedRoute } from '@angular/router';
 
@@ -13,23 +13,28 @@ import { ActivatedRoute } from '@angular/router';
 export class PostCreateComponent implements OnInit{
   postService: PostsService = inject(PostsService);
   activatedRoute: ActivatedRoute = inject(ActivatedRoute);
+  postForm: FormGroup;
 
   post: Post;
   private mode: string = 'create';
   isLoading: boolean = false;
 
-  onSavePost(postForm: NgForm){
-    if(postForm.valid){
+  onSavePost(){
+    if(this.postForm.valid){
       if(this.mode == 'create'){
-        this.postService.addPost(postForm.value.title, postForm.value.content); 
+        this.postService.addPost(this.postForm.value.title, this.postForm.value.content); 
       } else {
-        this.postService.updatePost(this.post.id, postForm.value.title, postForm.value.content);
+        this.postService.updatePost(this.post.id, this.postForm.value.title, this.postForm.value.content);
       }
     }
-    postForm.resetForm();
+    this.postForm.reset();
   }
 
   ngOnInit(): void {
+    this.postForm = new FormGroup({
+      title: new FormControl(null, [Validators.required, Validators.min(6)]),
+      content: new FormControl(null, [Validators.required]),
+    });
     this.activatedRoute.paramMap.subscribe((paramMap)=>{
       if(paramMap.has('postId')) {
         this.isLoading = true;
@@ -37,6 +42,7 @@ export class PostCreateComponent implements OnInit{
         const postId = paramMap.get('postId');
         this.postService.getPost(postId).subscribe(post=>{
           this.post = {id: post._id, title: post.title, content: post.content};
+          this.postForm.setValue({title: this.post.title, content: this.post.content});
           this.isLoading = false
         });   
       } else {
